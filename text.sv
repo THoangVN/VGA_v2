@@ -41,12 +41,12 @@ module text(
         4'h7 : char_addr_s = {3'b011, dig0};    // ones digit
         4'h8 : char_addr_s = {3'b011, dig} ;    //
         4'h9 : char_addr_s = 7'h00;     //
-        4'hA : char_addr_s = 7'h00;     // B
-        4'hB : char_addr_s = 7'h00;     // A
-        4'hC : char_addr_s = 7'h00;     // L
-        4'hD : char_addr_s = 7'h00;     // L
-        4'hE : char_addr_s = 7'h00;     // :
-        4'hF : char_addr_s = 7'h00;     // :
+        4'hA : char_addr_s = 7'h00;     // 
+        4'hB : char_addr_s = 7'h00;     // 
+        4'hC : char_addr_s = 7'h00;     // 
+        4'hD : char_addr_s = 7'h00;     // 
+        4'hE : char_addr_s = 7'h00;     // 
+        4'hF : char_addr_s = 7'h00;     // 
     endcase
     
     // mux for ascii ROM addresses and rgb

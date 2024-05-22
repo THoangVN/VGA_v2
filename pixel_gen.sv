@@ -18,24 +18,24 @@ module pixel_gen(
 //------------------------------------------------------//
 //                   MAP SETTING                        //
 //------------------------------------------------------//
-    localparam number_of_brick = 200;
-    localparam number_of_iron = 10;
+    localparam number_of_brick = 150;
+    // localparam number_of_iron = 0;
     wire hit, hit_by_enemy;
-    wire hit_by_enemy_2;
-    wire hit_by_enemy_3;
-    wire [number_of_brick+number_of_iron-1:0] stop_up, stop_down, stop_left, stop_right ;
-    wire [number_of_brick+number_of_iron-1:0] stop_enemy_up, stop_enemy_down, stop_enemy_left, stop_enemy_right ;
-    wire [number_of_brick+number_of_iron-1:0] stop_enemy_up_2, stop_enemy_down_2, stop_enemy_left_2, stop_enemy_right_2 ;
-    wire [number_of_brick+number_of_iron-1:0] stop_enemy_up_3, stop_enemy_down_3, stop_enemy_left_3, stop_enemy_right_3 ;
+    // wire hit_by_enemy_2;
+    // wire hit_by_enemy_3;
+    wire [number_of_brick-1:0] stop_up, stop_down, stop_left, stop_right ;
+    wire [number_of_brick-1:0] stop_enemy_up, stop_enemy_down, stop_enemy_left, stop_enemy_right ;
+    // wire [number_of_brick+number_of_iron-1:0] stop_enemy_up_2, stop_enemy_down_2, stop_enemy_left_2, stop_enemy_right_2 ;
+    // wire [number_of_brick+number_of_iron-1:0] stop_enemy_up_3, stop_enemy_down_3, stop_enemy_left_3, stop_enemy_right_3 ;
     wire [number_of_brick-1:0] brick_on;
     wire wall_on;
-    wire [number_of_iron-1:0] iron_on;
+    // wire [number_of_iron-1:0] iron_on;
     wire [29:0] brick_rom;
     wire [29:0] wall_rom;
     wire [29:0] iron_rom;
-    map_1 #(.number_of_brick(number_of_brick), 
-            .number_of_iron(number_of_iron)) map_1_unit (   .clk_50MHz(clk_50MHz),
-                                                            .reset(reset),
+    reg map_index;
+    map_1 #(.number_of_brick(number_of_brick)) map_1_unit ( .clk_50MHz(clk_50MHz),
+                                                            .reset(reset && temp_reset),
                                                             .x(x),
                                                             .y(y),
                                                             .brick_on(brick_on),
@@ -43,8 +43,8 @@ module pixel_gen(
                                                             .refresh_tick(refresh_tick),
                                                             .brick_rom_data(brick_rom),
                                                             .wall_rom_data(wall_rom),
-                                                            .iron_on(iron_on),
-                                                            .iron_rom_data(iron_rom),
+                                                            // .iron_on(iron_on),
+                                                            // .iron_rom_data(iron_rom),
                                                             .x_tank_r(x_tank_r),
                                                             .x_tank_l(x_tank_l),
                                                             .y_tank_t(y_tank_t),
@@ -53,23 +53,23 @@ module pixel_gen(
                                                             .x_enemy_l(x_enemy_l),
                                                             .y_enemy_t(y_enemy_t),
                                                             .y_enemy_b(y_enemy_b),
-                                                            .x_enemy_r_2(x_enemy_r_2),
-                                                            .x_enemy_l_2(x_enemy_l_2),
-                                                            .y_enemy_t_2(y_enemy_t_2),
-                                                            .y_enemy_b_2(y_enemy_b_2),
-                                                            .x_enemy_r_3(x_enemy_r_3),
-                                                            .x_enemy_l_3(x_enemy_l_3),
-                                                            .y_enemy_t_3(y_enemy_t_3),
-                                                            .y_enemy_b_3(y_enemy_b_3),
+                                                            // .x_enemy_r_2(x_enemy_r_2),
+                                                            // .x_enemy_l_2(x_enemy_l_2),
+                                                            // .y_enemy_t_2(y_enemy_t_2),
+                                                            // .y_enemy_b_2(y_enemy_b_2),
+                                                            // .x_enemy_r_3(x_enemy_r_3),
+                                                            // .x_enemy_l_3(x_enemy_l_3),
+                                                            // .y_enemy_t_3(y_enemy_t_3),
+                                                            // .y_enemy_b_3(y_enemy_b_3),
                                                             .x_bullet_r(sq_x_reg+3),
                                                             .x_bullet_l(sq_x_reg),
                                                             .y_bullet_t(sq_y_reg),
                                                             .y_bullet_b(sq_y_reg+3),
                                                             .hit(hit),
+                                                            .map_index(map_index),
                                                             .hit_by_enemy(hit_by_enemy),
-                                                            .hit_by_enemy_2(hit_by_enemy_2),
-                                                            .hit_by_enemy_3(hit_by_enemy_3),
-                                                            .bullet_size(SQUARE_SIZE),
+                                                            // .hit_by_enemy_2(hit_by_enemy_2),
+                                                            // .hit_by_enemy_3(hit_by_enemy_3),
                                                             .stop_go_up(stop_up),
                                                             .stop_go_down(stop_down),
                                                             .stop_go_left(stop_left),
@@ -78,107 +78,105 @@ module pixel_gen(
                                                             .stop_enemy_go_down(stop_enemy_down),
                                                             .stop_enemy_go_left(stop_enemy_left),
                                                             .stop_enemy_go_right(stop_enemy_right),
-                                                            .stop_enemy_go_up_2(stop_enemy_up_2),
-                                                            .stop_enemy_go_down_2(stop_enemy_down_2),
-                                                            .stop_enemy_go_left_2(stop_enemy_left_2),
-                                                            .stop_enemy_go_right_2(stop_enemy_right_2),
-                                                            .stop_enemy_go_up_3(stop_enemy_up_3),
-                                                            .stop_enemy_go_down_3(stop_enemy_down_3),
-                                                            .stop_enemy_go_left_3(stop_enemy_left_3),
-                                                            .stop_enemy_go_right_3(stop_enemy_right_3),
+                                                            // .stop_enemy_go_up_2(stop_enemy_up_2),
+                                                            // .stop_enemy_go_down_2(stop_enemy_down_2),
+                                                            // .stop_enemy_go_left_2(stop_enemy_left_2),
+                                                            // .stop_enemy_go_right_2(stop_enemy_right_2),
+                                                            // .stop_enemy_go_up_3(stop_enemy_up_3),
+                                                            // .stop_enemy_go_down_3(stop_enemy_down_3),
+                                                            // .stop_enemy_go_left_3(stop_enemy_left_3),
+                                                            // .stop_enemy_go_right_3(stop_enemy_right_3),
                                                             .x_bullet_enemy(x_bullet_enemy),
-                                                            .y_bullet_enemy(y_bullet_enemy),
-                                                            .x_bullet_enemy_2(x_bullet_enemy_2),
-                                                            .y_bullet_enemy_2(y_bullet_enemy_2),
-                                                            .x_bullet_enemy_3(x_bullet_enemy_3),
-                                                            .y_bullet_enemy_3(y_bullet_enemy_3)
+                                                            .y_bullet_enemy(y_bullet_enemy)
+                                                            // .x_bullet_enemy_2(x_bullet_enemy_2),
+                                                            // .y_bullet_enemy_2(y_bullet_enemy_2),
+                                                            // .x_bullet_enemy_3(x_bullet_enemy_3),
+                                                            // .y_bullet_enemy_3(y_bullet_enemy_3)
                                                             );
-
 
 //------------------------------------------------------//
 //                   ENEMY SETTING                      //
 //------------------------------------------------------//
-    wire enemy_on, bullet_on, enemy_on_2, bullet_on_2, enemy_on_3, bullet_on_3;
+    wire enemy_on, bullet_on;//, enemy_on_2, bullet_on_2, enemy_on_3, bullet_on_3;
     wire [29:0] rom_enemy;
-    wire [29:0] rom_enemy_2;
-    wire [29:0] rom_enemy_3;
+    // wire [29:0] rom_enemy_2;
+    // wire [29:0] rom_enemy_3;
     wire [9:0] x_enemy_l;
     wire [9:0] x_enemy_r;
     wire [9:0] y_enemy_t;
     wire [9:0] y_enemy_b;
-    wire [9:0] x_enemy_l_2;
-    wire [9:0] x_enemy_r_2;
-    wire [9:0] y_enemy_t_2;
-    wire [9:0] y_enemy_b_2;
-    wire [9:0] x_enemy_l_3;
-    wire [9:0] x_enemy_r_3;
-    wire [9:0] y_enemy_t_3;
-    wire [9:0] y_enemy_b_3;
+    // wire [9:0] x_enemy_l_2;
+    // wire [9:0] x_enemy_r_2;
+    // wire [9:0] y_enemy_t_2;
+    // wire [9:0] y_enemy_b_2;
+    // wire [9:0] x_enemy_l_3;
+    // wire [9:0] x_enemy_r_3;
+    // wire [9:0] y_enemy_t_3;
+    // wire [9:0] y_enemy_b_3;
     wire [9:0] x_bullet_enemy;
     wire [9:0] y_bullet_enemy;
-    wire [9:0] x_bullet_enemy_2;
-    wire [9:0] y_bullet_enemy_2;
-    wire [9:0] x_bullet_enemy_3;
-    wire [9:0] y_bullet_enemy_3;
-    wire enemy_detroyed,enemy_detroyed_2,enemy_detroyed_3;
-    wire reset_loc,reset_loc_2,reset_loc_3;
-    wire stop_up_by_enemy_1_2;
-    wire stop_down_by_enemy_1_2;
-    wire stop_left_by_enemy_1_2;
-    wire stop_right_by_enemy_1_2;
-    wire stop_up_by_enemy_2_1;
-    wire stop_down_by_enemy_2_1;
-    wire stop_left_by_enemy_2_1;
-    wire stop_right_by_enemy_2_1;
-    wire stop_up_by_enemy_1_3;
-    wire stop_down_by_enemy_1_3;
-    wire stop_left_by_enemy_1_3;
-    wire stop_right_by_enemy_1_3;
-    wire stop_up_by_enemy_2_3;
-    wire stop_down_by_enemy_2_3;
-    wire stop_left_by_enemy_2_3;
-    wire stop_right_by_enemy_2_3;
-    wire stop_up_by_enemy_3_2;
-    wire stop_down_by_enemy_3_2;
-    wire stop_left_by_enemy_3_2;
-    wire stop_right_by_enemy_3_2;
-    wire stop_up_by_enemy_3_1;
-    wire stop_down_by_enemy_3_1;
-    wire stop_left_by_enemy_3_1;
-    wire stop_right_by_enemy_3_1;
+    // wire [9:0] x_bullet_enemy_2;
+    // wire [9:0] y_bullet_enemy_2;
+    // wire [9:0] x_bullet_enemy_3;
+    // wire [9:0] y_bullet_enemy_3;
+    wire enemy_detroyed;//,enemy_detroyed_2,enemy_detroyed_3;
+    wire reset_loc;//,reset_loc_2,reset_loc_3;
+    // wire stop_up_by_enemy_1_2;
+    // wire stop_down_by_enemy_1_2;
+    // wire stop_left_by_enemy_1_2;
+    // wire stop_right_by_enemy_1_2;
+    // wire stop_up_by_enemy_2_1;
+    // wire stop_down_by_enemy_2_1;
+    // wire stop_left_by_enemy_2_1;
+    // wire stop_right_by_enemy_2_1;
+    // wire stop_up_by_enemy_1_3;
+    // wire stop_down_by_enemy_1_3;
+    // wire stop_left_by_enemy_1_3;
+    // wire stop_right_by_enemy_1_3;
+    // wire stop_up_by_enemy_2_3;
+    // wire stop_down_by_enemy_2_3;
+    // wire stop_left_by_enemy_2_3;
+    // wire stop_right_by_enemy_2_3;
+    // wire stop_up_by_enemy_3_2;
+    // wire stop_down_by_enemy_3_2;
+    // wire stop_left_by_enemy_3_2;
+    // wire stop_right_by_enemy_3_2;
+    // wire stop_up_by_enemy_3_1;
+    // wire stop_down_by_enemy_3_1;
+    // wire stop_left_by_enemy_3_1;
+    // wire stop_right_by_enemy_3_1;
     
-    assign stop_up_by_enemy_1_2     = ((y_enemy_b_2 + 1) == y_enemy_t) && (x_enemy_l <= x_enemy_r_2) && (x_enemy_r >= x_enemy_l_2);
-    assign stop_down_by_enemy_1_2   = ((y_enemy_t_2 - 1) == y_enemy_b) && (x_enemy_l <= x_enemy_r_2) && (x_enemy_r >= x_enemy_l_2);
-    assign stop_left_by_enemy_1_2   = ((x_enemy_r_2 + 1) == x_enemy_l) && (y_enemy_t <= y_enemy_b_2) && (y_enemy_b >= y_enemy_t_2);
-    assign stop_right_by_enemy_1_2  = ((x_enemy_l_2 - 1) == x_enemy_r) && (y_enemy_t <= y_enemy_b_2) && (y_enemy_b >= y_enemy_t_2);
+    // assign stop_up_by_enemy_1_2     = ((y_enemy_b_2 + 1) == y_enemy_t) && (x_enemy_l <= x_enemy_r_2) && (x_enemy_r >= x_enemy_l_2);
+    // assign stop_down_by_enemy_1_2   = ((y_enemy_t_2 - 1) == y_enemy_b) && (x_enemy_l <= x_enemy_r_2) && (x_enemy_r >= x_enemy_l_2);
+    // assign stop_left_by_enemy_1_2   = ((x_enemy_r_2 + 1) == x_enemy_l) && (y_enemy_t <= y_enemy_b_2) && (y_enemy_b >= y_enemy_t_2);
+    // assign stop_right_by_enemy_1_2  = ((x_enemy_l_2 - 1) == x_enemy_r) && (y_enemy_t <= y_enemy_b_2) && (y_enemy_b >= y_enemy_t_2);
     
-    assign stop_up_by_enemy_2_1     = ((y_enemy_b + 1) == y_enemy_t_2) && (x_enemy_l <= x_enemy_r_2) && (x_enemy_r >= x_enemy_l_2);
-    assign stop_down_by_enemy_2_1   = ((y_enemy_t - 1) == y_enemy_b_2) && (x_enemy_l <= x_enemy_r_2) && (x_enemy_r >= x_enemy_l_2);
-    assign stop_left_by_enemy_2_1   = ((x_enemy_r + 1) == x_enemy_l_2) && (y_enemy_t <= y_enemy_b_2) && (y_enemy_b >= y_enemy_t_2);
-    assign stop_right_by_enemy_2_1  = ((x_enemy_l - 1) == x_enemy_r_2) && (y_enemy_t <= y_enemy_b_2) && (y_enemy_b >= y_enemy_t_2);
+    // assign stop_up_by_enemy_2_1     = ((y_enemy_b + 1) == y_enemy_t_2) && (x_enemy_l <= x_enemy_r_2) && (x_enemy_r >= x_enemy_l_2);
+    // assign stop_down_by_enemy_2_1   = ((y_enemy_t - 1) == y_enemy_b_2) && (x_enemy_l <= x_enemy_r_2) && (x_enemy_r >= x_enemy_l_2);
+    // assign stop_left_by_enemy_2_1   = ((x_enemy_r + 1) == x_enemy_l_2) && (y_enemy_t <= y_enemy_b_2) && (y_enemy_b >= y_enemy_t_2);
+    // assign stop_right_by_enemy_2_1  = ((x_enemy_l - 1) == x_enemy_r_2) && (y_enemy_t <= y_enemy_b_2) && (y_enemy_b >= y_enemy_t_2);
 
-    assign stop_up_by_enemy_1_3     = ((y_enemy_b_3 + 1) == y_enemy_t) && (x_enemy_l <= x_enemy_r_3) && (x_enemy_r >= x_enemy_l_3);
-    assign stop_down_by_enemy_1_3   = ((y_enemy_t_3 - 1) == y_enemy_b) && (x_enemy_l <= x_enemy_r_3) && (x_enemy_r >= x_enemy_l_3);
-    assign stop_left_by_enemy_1_3   = ((x_enemy_r_3 + 1) == x_enemy_l) && (y_enemy_t <= y_enemy_b_3) && (y_enemy_b >= y_enemy_t_3);
-    assign stop_right_by_enemy_1_3  = ((x_enemy_l_3 - 1) == x_enemy_r) && (y_enemy_t <= y_enemy_b_3) && (y_enemy_b >= y_enemy_t_3);
+    // assign stop_up_by_enemy_1_3     = ((y_enemy_b_3 + 1) == y_enemy_t) && (x_enemy_l <= x_enemy_r_3) && (x_enemy_r >= x_enemy_l_3);
+    // assign stop_down_by_enemy_1_3   = ((y_enemy_t_3 - 1) == y_enemy_b) && (x_enemy_l <= x_enemy_r_3) && (x_enemy_r >= x_enemy_l_3);
+    // assign stop_left_by_enemy_1_3   = ((x_enemy_r_3 + 1) == x_enemy_l) && (y_enemy_t <= y_enemy_b_3) && (y_enemy_b >= y_enemy_t_3);
+    // assign stop_right_by_enemy_1_3  = ((x_enemy_l_3 - 1) == x_enemy_r) && (y_enemy_t <= y_enemy_b_3) && (y_enemy_b >= y_enemy_t_3);
     
-    assign stop_up_by_enemy_2_3     = ((y_enemy_b_3 + 1) == y_enemy_t_2) && (x_enemy_l_3 <= x_enemy_r_2) && (x_enemy_r_3 >= x_enemy_l_2);
-    assign stop_down_by_enemy_2_3   = ((y_enemy_t_3 - 1) == y_enemy_b_2) && (x_enemy_l_3 <= x_enemy_r_2) && (x_enemy_r_3 >= x_enemy_l_2);
-    assign stop_left_by_enemy_2_3   = ((x_enemy_r_3 + 1) == x_enemy_l_2) && (y_enemy_t_3 <= y_enemy_b_2) && (y_enemy_b_3 >= y_enemy_t_2);
-    assign stop_right_by_enemy_2_3  = ((x_enemy_l_3 - 1) == x_enemy_r_2) && (y_enemy_t_3 <= y_enemy_b_2) && (y_enemy_b_3 >= y_enemy_t_2);
+    // assign stop_up_by_enemy_2_3     = ((y_enemy_b_3 + 1) == y_enemy_t_2) && (x_enemy_l_3 <= x_enemy_r_2) && (x_enemy_r_3 >= x_enemy_l_2);
+    // assign stop_down_by_enemy_2_3   = ((y_enemy_t_3 - 1) == y_enemy_b_2) && (x_enemy_l_3 <= x_enemy_r_2) && (x_enemy_r_3 >= x_enemy_l_2);
+    // assign stop_left_by_enemy_2_3   = ((x_enemy_r_3 + 1) == x_enemy_l_2) && (y_enemy_t_3 <= y_enemy_b_2) && (y_enemy_b_3 >= y_enemy_t_2);
+    // assign stop_right_by_enemy_2_3  = ((x_enemy_l_3 - 1) == x_enemy_r_2) && (y_enemy_t_3 <= y_enemy_b_2) && (y_enemy_b_3 >= y_enemy_t_2);
 
-    assign stop_up_by_enemy_3_2     = ((y_enemy_b_2 + 1) == y_enemy_t_3) && (x_enemy_l_3 <= x_enemy_r_2) && (x_enemy_r_3 >= x_enemy_l_2);
-    assign stop_down_by_enemy_3_2   = ((y_enemy_t_2 - 1) == y_enemy_b_3) && (x_enemy_l_3 <= x_enemy_r_2) && (x_enemy_r_3 >= x_enemy_l_2);
-    assign stop_left_by_enemy_3_2   = ((x_enemy_r_2 + 1) == x_enemy_l_3) && (y_enemy_t_3 <= y_enemy_b_2) && (y_enemy_b_3 >= y_enemy_t_2);
-    assign stop_right_by_enemy_3_2  = ((x_enemy_l_2 - 1) == x_enemy_r_3) && (y_enemy_t_3 <= y_enemy_b_2) && (y_enemy_b_3 >= y_enemy_t_2);
+    // assign stop_up_by_enemy_3_2     = ((y_enemy_b_2 + 1) == y_enemy_t_3) && (x_enemy_l_3 <= x_enemy_r_2) && (x_enemy_r_3 >= x_enemy_l_2);
+    // assign stop_down_by_enemy_3_2   = ((y_enemy_t_2 - 1) == y_enemy_b_3) && (x_enemy_l_3 <= x_enemy_r_2) && (x_enemy_r_3 >= x_enemy_l_2);
+    // assign stop_left_by_enemy_3_2   = ((x_enemy_r_2 + 1) == x_enemy_l_3) && (y_enemy_t_3 <= y_enemy_b_2) && (y_enemy_b_3 >= y_enemy_t_2);
+    // assign stop_right_by_enemy_3_2  = ((x_enemy_l_2 - 1) == x_enemy_r_3) && (y_enemy_t_3 <= y_enemy_b_2) && (y_enemy_b_3 >= y_enemy_t_2);
     
-    assign stop_up_by_enemy_3_1     = ((y_enemy_b + 1) == y_enemy_t_3) && (x_enemy_l <= x_enemy_r_3) && (x_enemy_r >= x_enemy_l_3);
-    assign stop_down_by_enemy_3_1   = ((y_enemy_t - 1) == y_enemy_b_3) && (x_enemy_l <= x_enemy_r_3) && (x_enemy_r >= x_enemy_l_3);
-    assign stop_left_by_enemy_3_1   = ((x_enemy_r + 1) == x_enemy_l_3) && (y_enemy_t <= y_enemy_b_3) && (y_enemy_b >= y_enemy_t_3);
-    assign stop_right_by_enemy_3_1  = ((x_enemy_l - 1) == x_enemy_r_3) && (y_enemy_t <= y_enemy_b_3) && (y_enemy_b >= y_enemy_t_3);
+    // assign stop_up_by_enemy_3_1     = ((y_enemy_b + 1) == y_enemy_t_3) && (x_enemy_l <= x_enemy_r_3) && (x_enemy_r >= x_enemy_l_3);
+    // assign stop_down_by_enemy_3_1   = ((y_enemy_t - 1) == y_enemy_b_3) && (x_enemy_l <= x_enemy_r_3) && (x_enemy_r >= x_enemy_l_3);
+    // assign stop_left_by_enemy_3_1   = ((x_enemy_r + 1) == x_enemy_l_3) && (y_enemy_t <= y_enemy_b_3) && (y_enemy_b >= y_enemy_t_3);
+    // assign stop_right_by_enemy_3_1  = ((x_enemy_l - 1) == x_enemy_r_3) && (y_enemy_t <= y_enemy_b_3) && (y_enemy_b >= y_enemy_t_3);
 
-    enemy #(.number_of_brick(number_of_brick),
-            .number_of_iron(number_of_iron))    enemy1 (.clk_50MHz(clk_50MHz),
+    enemy #(.number_of_brick(number_of_brick)) enemy1 ( .clk_50MHz(clk_50MHz),
                                                         .reset(reset),                        
                                                         .x(x),                     
                                                         .y(y),                     
@@ -204,90 +202,90 @@ module pixel_gen(
                                                         .tank_detroyed(tank_detroyed),
                                                         .reset_loc(reset_loc),
                                                         .enemy_index('d1),
-                                                        .enemy_detroyed(enemy_detroyed),
-                                                        .enemy_stop_up_by_enemy(stop_up_by_enemy_1_2),
-                                                        .enemy_stop_down_by_enemy(stop_down_by_enemy_1_2),
-                                                        .enemy_stop_left_by_enemy(stop_left_by_enemy_1_2),
-                                                        .enemy_stop_right_by_enemy(stop_right_by_enemy_1_2),
-                                                        .enemy_stop_up_by_enemy_1(stop_up_by_enemy_1_3),
-                                                        .enemy_stop_down_by_enemy_1(stop_down_by_enemy_1_3),
-                                                        .enemy_stop_left_by_enemy_1(stop_left_by_enemy_1_3),
-                                                        .enemy_stop_right_by_enemy_1(stop_right_by_enemy_1_3)
+                                                        .enemy_detroyed(enemy_detroyed)
+                                                        // .enemy_stop_up_by_enemy(stop_up_by_enemy_1_2),
+                                                        // .enemy_stop_down_by_enemy(stop_down_by_enemy_1_2),
+                                                        // .enemy_stop_left_by_enemy(stop_left_by_enemy_1_2),
+                                                        // .enemy_stop_right_by_enemy(stop_right_by_enemy_1_2),
+                                                        // .enemy_stop_up_by_enemy_1(stop_up_by_enemy_1_3),
+                                                        // .enemy_stop_down_by_enemy_1(stop_down_by_enemy_1_3),
+                                                        // .enemy_stop_left_by_enemy_1(stop_left_by_enemy_1_3),
+                                                        // .enemy_stop_right_by_enemy_1(stop_right_by_enemy_1_3)
                                                         );
-    enemy #(.number_of_brick(number_of_brick),
-            .number_of_iron(number_of_iron))    enemy2 (.clk_50MHz(clk_50MHz),
-                                                        .reset(reset),                        
-                                                        .x(x),                     
-                                                        .y(y),                     
-                                                        .refresh_tick(refresh_tick),
-                                                        .stop_up(stop_enemy_up_2),
-                                                        .stop_down(stop_enemy_down_2),
-                                                        .stop_left(stop_enemy_left_2),
-                                                        .stop_right(stop_enemy_right_2),
-                                                        .x_enemy_r(x_enemy_r_2),
-                                                        .x_enemy_l(x_enemy_l_2),
-                                                        .y_enemy_t(y_enemy_t_2),
-                                                        .y_enemy_b(y_enemy_b_2),
-                                                        .enemy_on(enemy_on_2),
-                                                        .rom_enemy(rom_enemy_2),
-                                                        .bullet_on(bullet_on_2),
-                                                        .x_bullet(x_bullet_enemy_2),
-                                                        .y_bullet(y_bullet_enemy_2),
-                                                        .x_tank(x_tank_reg),
-                                                        .y_tank(y_tank_reg),
-                                                        .x_tank_bullet(sq_x_next),
-                                                        .y_tank_bullet(sq_y_next),
-                                                        .hit(hit_by_enemy_2),
-                                                        .tank_detroyed(tank_detroyed),
-                                                        .enemy_index('d2),
-                                                        .reset_loc(reset_loc_2),
-                                                        .enemy_detroyed(enemy_detroyed_2),
-                                                        .enemy_stop_up_by_enemy(stop_up_by_enemy_2_1),
-                                                        .enemy_stop_down_by_enemy(stop_down_by_enemy_2_1),
-                                                        .enemy_stop_left_by_enemy(stop_left_by_enemy_2_1),
-                                                        .enemy_stop_right_by_enemy(stop_right_by_enemy_2_1),
-                                                        .enemy_stop_up_by_enemy_1(stop_up_by_enemy_2_3),
-                                                        .enemy_stop_down_by_enemy_1(stop_down_by_enemy_2_3),
-                                                        .enemy_stop_left_by_enemy_1(stop_left_by_enemy_2_3),
-                                                        .enemy_stop_right_by_enemy_1(stop_right_by_enemy_2_3)
-                                                        );
-    enemy #(.number_of_brick(number_of_brick),
-            .number_of_iron(number_of_iron))    enemy3 (.clk_50MHz(clk_50MHz),
-                                                        .reset(reset),                        
-                                                        .x(x),                     
-                                                        .y(y),                     
-                                                        .refresh_tick(refresh_tick),
-                                                        .stop_up(stop_enemy_up_3),
-                                                        .stop_down(stop_enemy_down_3),
-                                                        .stop_left(stop_enemy_left_3),
-                                                        .stop_right(stop_enemy_right_3),
-                                                        .x_enemy_r(x_enemy_r_3),
-                                                        .x_enemy_l(x_enemy_l_3),
-                                                        .y_enemy_t(y_enemy_t_3),
-                                                        .y_enemy_b(y_enemy_b_3),
-                                                        .enemy_on(enemy_on_3),
-                                                        .rom_enemy(rom_enemy_3),
-                                                        .bullet_on(bullet_on_3),
-                                                        .x_bullet(x_bullet_enemy_3),
-                                                        .y_bullet(y_bullet_enemy_3),
-                                                        .x_tank(x_tank_reg),
-                                                        .y_tank(y_tank_reg),
-                                                        .x_tank_bullet(sq_x_next),
-                                                        .y_tank_bullet(sq_y_next),
-                                                        .hit(hit_by_enemy_3),
-                                                        .tank_detroyed(tank_detroyed),
-                                                        .enemy_index('d3),
-                                                        .reset_loc(reset_loc_3),
-                                                        .enemy_detroyed(enemy_detroyed_3),
-                                                        .enemy_stop_up_by_enemy(stop_up_by_enemy_3_1),
-                                                        .enemy_stop_down_by_enemy(stop_down_by_enemy_3_1),
-                                                        .enemy_stop_left_by_enemy(stop_left_by_enemy_3_1),
-                                                        .enemy_stop_right_by_enemy(stop_right_by_enemy_3_1),
-                                                        .enemy_stop_up_by_enemy_1(stop_up_by_enemy_3_2),
-                                                        .enemy_stop_down_by_enemy_1(stop_down_by_enemy_3_2),
-                                                        .enemy_stop_left_by_enemy_1(stop_left_by_enemy_3_2),
-                                                        .enemy_stop_right_by_enemy_1(stop_right_by_enemy_3_2)
-                                                        );
+    // enemy #(.number_of_brick(number_of_brick),
+    //         .number_of_iron(number_of_iron))    enemy2 (.clk_50MHz(clk_50MHz),
+    //                                                     .reset(reset),                        
+    //                                                     .x(x),                     
+    //                                                     .y(y),                     
+    //                                                     .refresh_tick(refresh_tick),
+    //                                                     .stop_up(stop_enemy_up_2),
+    //                                                     .stop_down(stop_enemy_down_2),
+    //                                                     .stop_left(stop_enemy_left_2),
+    //                                                     .stop_right(stop_enemy_right_2),
+    //                                                     .x_enemy_r(x_enemy_r_2),
+    //                                                     .x_enemy_l(x_enemy_l_2),
+    //                                                     .y_enemy_t(y_enemy_t_2),
+    //                                                     .y_enemy_b(y_enemy_b_2),
+    //                                                     .enemy_on(enemy_on_2),
+    //                                                     .rom_enemy(rom_enemy_2),
+    //                                                     .bullet_on(bullet_on_2),
+    //                                                     .x_bullet(x_bullet_enemy_2),
+    //                                                     .y_bullet(y_bullet_enemy_2),
+    //                                                     .x_tank(x_tank_reg),
+    //                                                     .y_tank(y_tank_reg),
+    //                                                     .x_tank_bullet(sq_x_next),
+    //                                                     .y_tank_bullet(sq_y_next),
+    //                                                     .hit(hit_by_enemy_2),
+    //                                                     .tank_detroyed(tank_detroyed),
+    //                                                     .enemy_index('d2),
+    //                                                     .reset_loc(reset_loc_2),
+    //                                                     .enemy_detroyed(enemy_detroyed_2),
+    //                                                     .enemy_stop_up_by_enemy(stop_up_by_enemy_2_1),
+    //                                                     .enemy_stop_down_by_enemy(stop_down_by_enemy_2_1),
+    //                                                     .enemy_stop_left_by_enemy(stop_left_by_enemy_2_1),
+    //                                                     .enemy_stop_right_by_enemy(stop_right_by_enemy_2_1),
+    //                                                     .enemy_stop_up_by_enemy_1(stop_up_by_enemy_2_3),
+    //                                                     .enemy_stop_down_by_enemy_1(stop_down_by_enemy_2_3),
+    //                                                     .enemy_stop_left_by_enemy_1(stop_left_by_enemy_2_3),
+    //                                                     .enemy_stop_right_by_enemy_1(stop_right_by_enemy_2_3)
+    //                                                     );
+    // enemy #(.number_of_brick(number_of_brick),
+    //         .number_of_iron(number_of_iron))    enemy3 (.clk_50MHz(clk_50MHz),
+    //                                                     .reset(reset),                        
+    //                                                     .x(x),                     
+    //                                                     .y(y),                     
+    //                                                     .refresh_tick(refresh_tick),
+    //                                                     .stop_up(stop_enemy_up_3),
+    //                                                     .stop_down(stop_enemy_down_3),
+    //                                                     .stop_left(stop_enemy_left_3),
+    //                                                     .stop_right(stop_enemy_right_3),
+    //                                                     .x_enemy_r(x_enemy_r_3),
+    //                                                     .x_enemy_l(x_enemy_l_3),
+    //                                                     .y_enemy_t(y_enemy_t_3),
+    //                                                     .y_enemy_b(y_enemy_b_3),
+    //                                                     .enemy_on(enemy_on_3),
+    //                                                     .rom_enemy(rom_enemy_3),
+    //                                                     .bullet_on(bullet_on_3),
+    //                                                     .x_bullet(x_bullet_enemy_3),
+    //                                                     .y_bullet(y_bullet_enemy_3),
+    //                                                     .x_tank(x_tank_reg),
+    //                                                     .y_tank(y_tank_reg),
+    //                                                     .x_tank_bullet(sq_x_next),
+    //                                                     .y_tank_bullet(sq_y_next),
+    //                                                     .hit(hit_by_enemy_3),
+    //                                                     .tank_detroyed(tank_detroyed),
+    //                                                     .enemy_index('d3),
+    //                                                     .reset_loc(reset_loc_3),
+    //                                                     .enemy_detroyed(enemy_detroyed_3),
+    //                                                     .enemy_stop_up_by_enemy(stop_up_by_enemy_3_1),
+    //                                                     .enemy_stop_down_by_enemy(stop_down_by_enemy_3_1),
+    //                                                     .enemy_stop_left_by_enemy(stop_left_by_enemy_3_1),
+    //                                                     .enemy_stop_right_by_enemy(stop_right_by_enemy_3_1),
+    //                                                     .enemy_stop_up_by_enemy_1(stop_up_by_enemy_3_2),
+    //                                                     .enemy_stop_down_by_enemy_1(stop_down_by_enemy_3_2),
+    //                                                     .enemy_stop_left_by_enemy_1(stop_left_by_enemy_3_2),
+    //                                                     .enemy_stop_right_by_enemy_1(stop_right_by_enemy_3_2)
+    //                                                     );
 
 //------------------------------------------------------//
 //                  TANK SETTING                        //
@@ -320,21 +318,21 @@ module pixel_gen(
     bit reset_bullet;
 
     assign reset_bullet = reset ;
-    assign tank_detroyed = (((y_bullet_enemy ) < y_tank_b)   && (((y_bullet_enemy+3) ) > y_tank_t)   && ((x_bullet_enemy ) < x_tank_r)   && (((x_bullet_enemy+3) ) > x_tank_l))
-                        || (((y_bullet_enemy_2 ) < y_tank_b) && (((y_bullet_enemy_2+3) ) > y_tank_t) && ((x_bullet_enemy_2 ) < x_tank_r) && (((x_bullet_enemy_2+3) ) > x_tank_l))
-                        || (((y_bullet_enemy_3 ) < y_tank_b) && (((y_bullet_enemy_3+3) ) > y_tank_t) && ((x_bullet_enemy_3 ) < x_tank_r) && (((x_bullet_enemy_3+3) ) > x_tank_l));
-    assign stop_up_by_enemy     = (y_tank_t == (y_enemy_b ))   && (x_tank_l <= (x_enemy_r ))   && (x_tank_r >= (x_enemy_l ))
-                                ||(y_tank_t == (y_enemy_b_2 )) && (x_tank_l <= (x_enemy_r_2 )) && (x_tank_r >= (x_enemy_l_2 ))
-                                ||(y_tank_t == (y_enemy_b_3 )) && (x_tank_l <= (x_enemy_r_3 )) && (x_tank_r >= (x_enemy_l_3 ));
-    assign stop_down_by_enemy  = (y_tank_b == (y_enemy_t ))    && (x_tank_l <= (x_enemy_r ))   && (x_tank_r >= (x_enemy_l ))
-                                ||(y_tank_b == (y_enemy_t_2 )) && (x_tank_l <= (x_enemy_r_2 )) && (x_tank_r >= (x_enemy_l_2 ))
-                                ||(y_tank_b == (y_enemy_t_3 )) && (x_tank_l <= (x_enemy_r_3 )) && (x_tank_r >= (x_enemy_l_3 ));
-    assign stop_left_by_enemy  = (x_tank_l == (x_enemy_r ))    && (y_tank_t <= (y_enemy_b ))   && (y_tank_b >= (y_enemy_t ))
-                                ||(x_tank_l == (x_enemy_r_2 )) && (y_tank_t <= (y_enemy_b_2 )) && (y_tank_b >= (y_enemy_t_2 ))
-                                ||(x_tank_l == (x_enemy_r_3 )) && (y_tank_t <= (y_enemy_b_3 )) && (y_tank_b >= (y_enemy_t_3 ));
-    assign stop_right_by_enemy = (x_tank_r == (x_enemy_l ))    && (y_tank_t <= (y_enemy_b ))   && (y_tank_b >= (y_enemy_t ))
-                                ||(x_tank_r == (x_enemy_l_2 )) && (y_tank_t <= (y_enemy_b_2 )) && (y_tank_b >= (y_enemy_t_2 ))
-                                ||(x_tank_r == (x_enemy_l_3 )) && (y_tank_t <= (y_enemy_b_3 )) && (y_tank_b >= (y_enemy_t_3 ));
+    assign tank_detroyed = (((y_bullet_enemy ) < y_tank_b)   && (((y_bullet_enemy+3) ) > y_tank_t)   && ((x_bullet_enemy ) < x_tank_r)   && (((x_bullet_enemy+3) ) > x_tank_l));
+                        // || (((y_bullet_enemy_2 ) < y_tank_b) && (((y_bullet_enemy_2+3) ) > y_tank_t) && ((x_bullet_enemy_2 ) < x_tank_r) && (((x_bullet_enemy_2+3) ) > x_tank_l))
+                        // || (((y_bullet_enemy_3 ) < y_tank_b) && (((y_bullet_enemy_3+3) ) > y_tank_t) && ((x_bullet_enemy_3 ) < x_tank_r) && (((x_bullet_enemy_3+3) ) > x_tank_l));
+    assign stop_up_by_enemy     = (y_tank_t == (y_enemy_b ))   && (x_tank_l <= (x_enemy_r ))   && (x_tank_r >= (x_enemy_l ));
+                                // ||(y_tank_t == (y_enemy_b_2 )) && (x_tank_l <= (x_enemy_r_2 )) && (x_tank_r >= (x_enemy_l_2 ))
+                                // ||(y_tank_t == (y_enemy_b_3 )) && (x_tank_l <= (x_enemy_r_3 )) && (x_tank_r >= (x_enemy_l_3 ));
+    assign stop_down_by_enemy  = (y_tank_b == (y_enemy_t ))    && (x_tank_l <= (x_enemy_r ))   && (x_tank_r >= (x_enemy_l ));
+                                // ||(y_tank_b == (y_enemy_t_2 )) && (x_tank_l <= (x_enemy_r_2 )) && (x_tank_r >= (x_enemy_l_2 ))
+                                // ||(y_tank_b == (y_enemy_t_3 )) && (x_tank_l <= (x_enemy_r_3 )) && (x_tank_r >= (x_enemy_l_3 ));
+    assign stop_left_by_enemy  = (x_tank_l == (x_enemy_r ))    && (y_tank_t <= (y_enemy_b ))   && (y_tank_b >= (y_enemy_t ));
+                                // ||(x_tank_l == (x_enemy_r_2 )) && (y_tank_t <= (y_enemy_b_2 )) && (y_tank_b >= (y_enemy_t_2 ))
+                                // ||(x_tank_l == (x_enemy_r_3 )) && (y_tank_t <= (y_enemy_b_3 )) && (y_tank_b >= (y_enemy_t_3 ));
+    assign stop_right_by_enemy = (x_tank_r == (x_enemy_l ))    && (y_tank_t <= (y_enemy_b ))   && (y_tank_b >= (y_enemy_t ));
+                                // ||(x_tank_r == (x_enemy_l_2 )) && (y_tank_t <= (y_enemy_b_2 )) && (y_tank_b >= (y_enemy_t_2 ))
+                                // ||(x_tank_r == (x_enemy_l_3 )) && (y_tank_t <= (y_enemy_b_3 )) && (y_tank_b >= (y_enemy_t_3 ));
     // Register Control
     always @(posedge clk_50MHz or negedge reset or posedge reset_location)
     begin
@@ -476,30 +474,30 @@ module pixel_gen(
 //------------------------------------------------------//
 //                      EAGLE                           //
 //------------------------------------------------------//
-    wire eagle_on;
-    wire eagle_detroyed;
-    wire [29:0] rom_eagle;
-    wire [9:0] x_eagle;
-    wire [9:0] y_eagle;
-    eagle eagle_unit (  .clk_50MHz(clk_50MHz),        
-                        .reset(reset),                
-                        .x(x),              
-                        .y(y),              
-                        .refresh_tick(refresh_tick),
-                        .x_enemy_bullet(x_bullet_enemy),
-                        .y_enemy_bullet(y_bullet_enemy),
-                        .x_enemy_bullet_2(x_bullet_enemy_2),
-                        .y_enemy_bullet_2(y_bullet_enemy_2),
-                        .x_enemy_bullet_3(x_bullet_enemy_3),
-                        .y_enemy_bullet_3(y_bullet_enemy_3),
-                        .x_tank_bullet(sq_x_reg),
-                        .y_tank_bullet(sq_y_reg),
-                        .x_eagle(x_eagle),
-                        .y_eagle(y_eagle),
-                        .rom_eagle(rom_eagle),
-                        .eagle_on(eagle_on),
-                        .eagle_detroyed(eagle_detroyed)
-                        );
+    // wire eagle_on;
+    // wire eagle_detroyed;
+    // wire [29:0] rom_eagle;
+    // wire [9:0] x_eagle;
+    // wire [9:0] y_eagle;
+    // eagle eagle_unit (  .clk_50MHz(clk_50MHz),        
+    //                     .reset(reset),                
+    //                     .x(x),              
+    //                     .y(y),              
+    //                     .refresh_tick(refresh_tick),
+    //                     .x_enemy_bullet(x_bullet_enemy),
+    //                     .y_enemy_bullet(y_bullet_enemy),
+    //                     .x_enemy_bullet_2(x_bullet_enemy_2),
+    //                     .y_enemy_bullet_2(y_bullet_enemy_2),
+    //                     .x_enemy_bullet_3(x_bullet_enemy_3),
+    //                     .y_enemy_bullet_3(y_bullet_enemy_3),
+    //                     .x_tank_bullet(sq_x_reg),
+    //                     .y_tank_bullet(sq_y_reg),
+    //                     .x_eagle(x_eagle),
+    //                     .y_eagle(y_eagle),
+    //                     .rom_eagle(rom_eagle),
+    //                     .eagle_on(eagle_on),
+    //                     .eagle_detroyed(eagle_detroyed)
+    //                     );
 
 //------------------------------------------------------//
 //               TANK BULLET SETTING                    //
@@ -570,7 +568,7 @@ module pixel_gen(
                             sq_x_next = sq_x_reg + SQUARE_VELOCITY;
                         end
                     endcase
-                    if ((sq_x_next > 607) || (sq_x_next < 28) || (sq_y_next > 447) || (sq_y_next < 28) || hit || enemy_detroyed || enemy_detroyed_2 || enemy_detroyed_3)
+                    if ((sq_x_next > 607) || (sq_x_next < 28) || (sq_y_next > 447) || (sq_y_next < 28) || hit || enemy_detroyed )//|| enemy_detroyed_2 || enemy_detroyed_3)
                         state = IDLE;
                 end
             endcase
@@ -590,7 +588,7 @@ module pixel_gen(
     assign lives[3] = (x >= 320) && (x < 336) && (y >= 456) && (y < 472);
     assign lives[4] = (x >= 352) && (x < 368) && (y >= 456) && (y < 472);
     assign lives[5] = (x >= 384) && (x < 400) && (y >= 456) && (y < 472);
-    assign game_over = (count === 0) || (eagle_detroyed === 1);
+    assign game_over = (count === 0);// || (eagle_detroyed === 1);
 
     heart_on_rom    heart_on_unit   (.clk(clk_50MHz), .row(y), .col(x), .color_data(rom_heart_on));
     heart_off_rom   heart_off_unit  (.clk(clk_50MHz), .row(y), .col(x), .color_data(rom_heart_off));
@@ -601,6 +599,7 @@ module pixel_gen(
     wire [3:0] dig0, dig1,dig;
     wire [29:0] text_rgb;
     wire text_on;
+    bit temp_reset;
     m100_counter counter_unit  (.clk(clk_50MHz),
                                 .reset(reset),
                                 .d_inc((reset_loc || reset_loc_2 || reset_loc_3)),  
@@ -618,7 +617,8 @@ module pixel_gen(
                     .dig(dig),
                     .text_on(text_on),
                     .text_rgb(text_rgb));
-
+    assign map_index = ((dig0 == 1) && (dig == 0)) ? (map_index+1) : map_index;
+    
 //------------------------------------------------------//
 //                      GAME OVER                       //
 //------------------------------------------------------//
@@ -652,41 +652,41 @@ module pixel_gen(
             rgb = over_rgb;
         else  begin 	
             // eagle
-                if(eagle_on && lower_yellow_on)     
-                    if(&rom_eagle == 1)  
-                        rgb = rom_road;
-                    else
-                        rgb = rom_eagle;
+                // if(eagle_on && lower_yellow_on)     
+                //     if(&rom_eagle == 1)  
+                //         rgb = rom_road;
+                //     else
+                //         rgb = rom_eagle;
                     
                     
-                else if(eagle_on && upper_yellow_on)
-                    if(&rom_eagle == 1)  
-                        rgb = rom_water;
-                    else
-                        rgb = rom_eagle;
+                // else if(eagle_on && upper_yellow_on)
+                //     if(&rom_eagle == 1)  
+                //         rgb = rom_water;
+                //     else
+                //         rgb = rom_eagle;
             
             
-                else if(eagle_on && street_on)
-                    if(&rom_eagle == 1 )  
-                        rgb = rom_sand;
-                    else
-                        rgb = rom_eagle;
+                // else if(eagle_on && street_on)
+                //     if(&rom_eagle == 1 )  
+                //         rgb = rom_sand;
+                //     else
+                //         rgb = rom_eagle;
                 
                 
-                else if(eagle_on && water_on)      
-                    if(&rom_eagle == 1)  
-                        rgb = rom_sand;
-                    else
-                        rgb = rom_eagle;
+                // else if(eagle_on && water_on)      
+                //     if(&rom_eagle == 1)  
+                //         rgb = rom_sand;
+                //     else
+                //         rgb = rom_eagle;
                 
-                else if(eagle_on && street_2_on)
-                    if(&rom_eagle == 1) 
-                        rgb = rom_road;
-                    else
-                        rgb = rom_eagle;
+                // else if(eagle_on && street_2_on)
+                //     if(&rom_eagle == 1) 
+                //         rgb = rom_road;
+                //     else
+                //         rgb = rom_eagle;
 
             // tank
-            else 
+            // else 
             if(tank_on && lower_yellow_on)      
                 if(|tank_rom == 0)              
                     rgb = rom_road;
@@ -755,72 +755,72 @@ module pixel_gen(
                     rgb = rom_enemy;
             
             // enemy 2
-            else if(enemy_on_2 && lower_yellow_on)    
-                if(&rom_enemy_2 == 1)  
-                    rgb = rom_road;
-                else
-                    rgb = rom_enemy_2;
+            // else if(enemy_on_2 && lower_yellow_on)    
+            //     if(&rom_enemy_2 == 1)  
+            //         rgb = rom_road;
+            //     else
+            //         rgb = rom_enemy_2;
                 
                 
-            else if(enemy_on_2 && upper_yellow_on) 
-                if(&rom_enemy_2 == 1)  
-                    rgb = rom_water;
-                else
-                    rgb = rom_enemy_2;
+            // else if(enemy_on_2 && upper_yellow_on) 
+            //     if(&rom_enemy_2 == 1)  
+            //         rgb = rom_water;
+            //     else
+            //         rgb = rom_enemy_2;
         
         
-            else if(enemy_on_2 && street_on)     
-                if(&rom_enemy_2 == 1 )  
-                    rgb = rom_sand;
-                else
-                    rgb = rom_enemy_2;
+            // else if(enemy_on_2 && street_on)     
+            //     if(&rom_enemy_2 == 1 )  
+            //         rgb = rom_sand;
+            //     else
+            //         rgb = rom_enemy_2;
             
             
-            else if(enemy_on_2 && water_on)      
-                if(&rom_enemy_2 == 1)  
-                    rgb = rom_sand;
-                else
-                    rgb = rom_enemy_2;
+            // else if(enemy_on_2 && water_on)      
+            //     if(&rom_enemy_2 == 1)  
+            //         rgb = rom_sand;
+            //     else
+            //         rgb = rom_enemy_2;
             
-            else if(enemy_on_2 && street_2_on)        
-                if(&rom_enemy_2 == 1) 
-                    rgb = rom_road;
-                else
-                    rgb = rom_enemy_2;
+            // else if(enemy_on_2 && street_2_on)        
+            //     if(&rom_enemy_2 == 1) 
+            //         rgb = rom_road;
+            //     else
+            //         rgb = rom_enemy_2;
             
-            // enemy 3
-            else if(enemy_on_3 && lower_yellow_on)    
-                if(&rom_enemy_3 == 1)  
-                    rgb = rom_road;
-                else
-                    rgb = rom_enemy_3;
+            // // enemy 3
+            // else if(enemy_on_3 && lower_yellow_on)    
+            //     if(&rom_enemy_3 == 1)  
+            //         rgb = rom_road;
+            //     else
+            //         rgb = rom_enemy_3;
                 
                 
-            else if(enemy_on_3 && upper_yellow_on) 
-                if(&rom_enemy_3 == 1)  
-                    rgb = rom_water;
-                else
-                    rgb = rom_enemy_3;
+            // else if(enemy_on_3 && upper_yellow_on) 
+            //     if(&rom_enemy_3 == 1)  
+            //         rgb = rom_water;
+            //     else
+            //         rgb = rom_enemy_3;
         
         
-            else if(enemy_on_3 && street_on)     
-                if(&rom_enemy_3 == 1 )  
-                    rgb = rom_sand;
-                else
-                    rgb = rom_enemy_3;
+            // else if(enemy_on_3 && street_on)     
+            //     if(&rom_enemy_3 == 1 )  
+            //         rgb = rom_sand;
+            //     else
+            //         rgb = rom_enemy_3;
             
             
-            else if(enemy_on_3 && water_on)      
-                if(&rom_enemy_3 == 1)  
-                    rgb = rom_sand;
-                else
-                    rgb = rom_enemy_3;
+            // else if(enemy_on_3 && water_on)      
+            //     if(&rom_enemy_3 == 1)  
+            //         rgb = rom_sand;
+            //     else
+            //         rgb = rom_enemy_3;
             
-            else if(enemy_on_3 && street_2_on)        
-                if(&rom_enemy_3 == 1) 
-                    rgb = rom_road;
-                else
-                    rgb = rom_enemy_3;
+            // else if(enemy_on_3 && street_2_on)        
+            //     if(&rom_enemy_3 == 1) 
+            //         rgb = rom_road;
+            //     else
+            //         rgb = rom_enemy_3;
             
             // scoreboard
             else if(text_on)
@@ -880,8 +880,8 @@ module pixel_gen(
 
             else if(wall_on)
                 rgb = wall_rom;	
-            else if (|iron_on)
-                rgb = iron_rom;
+            // else if (|iron_on)
+            //     rgb = iron_rom;
             else if (|brick_on)
                 rgb = brick_rom;
             
@@ -889,10 +889,10 @@ module pixel_gen(
                 rgb = RED;
             else if (bullet_on)
                 rgb = RED;
-            else if (bullet_on_2)
-                rgb = BLUE;
-            else if (bullet_on_3)
-                rgb = BLACK;
+            // else if (bullet_on_2)
+            //     rgb = BLUE;
+            // else if (bullet_on_3)
+            //     rgb = BLACK;
             // game board backgrounds    
             else if(upper_yellow_on)
                 rgb = rom_water;
