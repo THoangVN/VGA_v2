@@ -1,6 +1,6 @@
 module text(
     input clk,
-    input [3:0] dig0, dig1,dig,
+    input [4:0] dig0, dig1,dig,
     input [9:0] x, y,
     output text_on,
     output reg [29:0] text_rgb

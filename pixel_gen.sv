@@ -18,7 +18,7 @@ module pixel_gen(
 //------------------------------------------------------//
 //                   MAP SETTING                        //
 //------------------------------------------------------//
-    localparam number_of_brick = 150;
+    localparam number_of_brick = 180;
     // localparam number_of_iron = 0;
     wire hit, hit_by_enemy;
     // wire hit_by_enemy_2;
@@ -33,9 +33,16 @@ module pixel_gen(
     wire [29:0] brick_rom;
     wire [29:0] wall_rom;
     wire [29:0] iron_rom;
-    reg map_index;
+    bit map_index;
+        
+    bit change_map = 0;
+    always @(map_index) begin
+        change_map = 1;
+        @(posedge clk_50MHz) change_map = 0;
+    end
+
     map_1 #(.number_of_brick(number_of_brick)) map_1_unit ( .clk_50MHz(clk_50MHz),
-                                                            .reset(reset && temp_reset),
+                                                            .reset(reset && (!change_map)),
                                                             .x(x),
                                                             .y(y),
                                                             .brick_on(brick_on),
@@ -177,7 +184,7 @@ module pixel_gen(
     // assign stop_right_by_enemy_3_1  = ((x_enemy_l - 1) == x_enemy_r_3) && (y_enemy_t <= y_enemy_b_3) && (y_enemy_b >= y_enemy_t_3);
 
     enemy #(.number_of_brick(number_of_brick)) enemy1 ( .clk_50MHz(clk_50MHz),
-                                                        .reset(reset),                        
+                                                        .reset(reset && (!change_map)),
                                                         .x(x),                     
                                                         .y(y),                     
                                                         .refresh_tick(refresh_tick),
@@ -317,7 +324,7 @@ module pixel_gen(
     bit reset_location;
     bit reset_bullet;
 
-    assign reset_bullet = reset ;
+    assign reset_bullet = reset && (!change_map);
     assign tank_detroyed = (((y_bullet_enemy ) < y_tank_b)   && (((y_bullet_enemy+3) ) > y_tank_t)   && ((x_bullet_enemy ) < x_tank_r)   && (((x_bullet_enemy+3) ) > x_tank_l));
                         // || (((y_bullet_enemy_2 ) < y_tank_b) && (((y_bullet_enemy_2+3) ) > y_tank_t) && ((x_bullet_enemy_2 ) < x_tank_r) && (((x_bullet_enemy_2+3) ) > x_tank_l))
                         // || (((y_bullet_enemy_3 ) < y_tank_b) && (((y_bullet_enemy_3+3) ) > y_tank_t) && ((x_bullet_enemy_3 ) < x_tank_r) && (((x_bullet_enemy_3+3) ) > x_tank_l));
@@ -334,9 +341,9 @@ module pixel_gen(
                                 // ||(x_tank_r == (x_enemy_l_2 )) && (y_tank_t <= (y_enemy_b_2 )) && (y_tank_b >= (y_enemy_t_2 ))
                                 // ||(x_tank_r == (x_enemy_l_3 )) && (y_tank_t <= (y_enemy_b_3 )) && (y_tank_b >= (y_enemy_t_3 ));
     // Register Control
-    always @(posedge clk_50MHz or negedge reset or posedge reset_location)
+    always @(posedge clk_50MHz or negedge reset or posedge reset_location or posedge change_map)
     begin
-        if(!reset || reset_location) begin
+        if(!reset || change_map || reset_location) begin
             if(count ==number_of_lives*2)
             begin
                 x_tank_reg <= X_START;
@@ -388,8 +395,8 @@ module pixel_gen(
         end
     end     
     
-    always @(posedge clk_50MHz or negedge reset) begin : hold_state_boom
-        if (!reset) begin
+    always @(posedge clk_50MHz or negedge reset or posedge change_map) begin : hold_state_boom
+        if (!reset || change_map) begin
             hold_tank_detroyed = 0;
         end
         else if (refresh_tick)
@@ -449,9 +456,9 @@ module pixel_gen(
     reg [1:0] tank_select;
     bit [1:0] bullet_select ;
 
-    always @(posedge clk_50MHz or negedge reset)
+    always @(posedge clk_50MHz or negedge reset or posedge change_map)
     begin
-        if(!reset) begin
+        if(!reset || change_map) begin
             tank_select = 2'b00;
             count = number_of_lives*2;
         end
@@ -596,12 +603,12 @@ module pixel_gen(
 //------------------------------------------------------//
 //                   SCORE BOARD                        //
 //------------------------------------------------------//
-    wire [3:0] dig0, dig1,dig;
+    wire [4:0] dig0, dig1,dig;
     wire [29:0] text_rgb;
     wire text_on;
-    bit temp_reset;
+    // bit temp_reset;
     m100_counter counter_unit  (.clk(clk_50MHz),
-                                .reset(reset),
+                                .reset(reset && (!change_map)),
                                 .d_inc((reset_loc || reset_loc_2 || reset_loc_3)),  
                                 // .d_clr(reset),
                                 .dig0(dig0),
@@ -617,7 +624,7 @@ module pixel_gen(
                     .dig(dig),
                     .text_on(text_on),
                     .text_rgb(text_rgb));
-    assign map_index = ((dig0 == 1) && (dig == 0)) ? (map_index+1) : map_index;
+    assign map_index = ((dig0 == 0) && (dig == 3)) ? (map_index+1) : map_index;
     
 //------------------------------------------------------//
 //                      GAME OVER                       //
